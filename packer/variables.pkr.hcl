@@ -1,22 +1,7 @@
-variable "subscription_id" {
-  type    = string
-  default = "<YOUR_SUBSCRIPTION_ID>"
-}
-
-variable "tenant_id" {
-  type    = string
-  default = "<YOUR_TENANT_ID>"
-}
-
-variable "client_id" {
-  type    = string
-  default = "<YOUR_CLIENT_ID>"
-}
-
-variable "client_secret" {
-  type    = string
-  default = "<YOUR_CLIENT_SECRET>"
-}
+variable "subscription_id" {}
+variable "tenant_id" {}
+variable "client_id" {}
+variable "client_secret" {}
 
 variable "resource_group_name" {
   type    = string
@@ -53,13 +38,8 @@ variable "subnet_name" {
   default = "subnet-prod"
 }
 
-variable "admin_username" {
-  type    = string
-  default = "azureuser"
-}
-
+variable "admin_username" {}
 variable "admin_password" {
   type      = string
   sensitive = true
-  default   = "<YOUR_PASSWORD>"
 }

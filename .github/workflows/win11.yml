@@ -4,37 +4,39 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - shellpacker
+      - main
 
 jobs:
   packer:
     runs-on: ubuntu-latest
 
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Azure CLI
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
       - name: Install Packer
         run: |
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository           "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-add-repository \
+          "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get update && sudo apt-get install -y packer
 
-      - name: Packer Init
-        run: packer init packer/windows11.pkr.hcl
-
-      - name: Validate Template
-        run: packer validate           -var "resource_group_name=rg-packer"           packer/windows11.pkr.hcl
-
-      - name: Build Image
-        run: packer build           -var "resource_group_name=rg-packer"           packer/windows11.pkr.hcl
+      - name: Build Windows 11 Image
+        run: |
+          packer init packer/windows11.pkr.hcl
+          packer validate \
+            -var "subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
+            -var "tenant_id=${{ secrets.ARM_TENANT_ID }}" \
+            -var "client_id=${{ secrets.ARM_CLIENT_ID }}" \
+            -var "client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var "admin_username=${{ secrets.AZURE_ADMIN_USERNAME }}" \
+            -var "admin_password=${{ secrets.AZURE_ADMIN_PASSWORD }}" \
+            packer/windows11.pkr.hcl
+          packer build \
+            -var "subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
+            -var "tenant_id=${{ secrets.ARM_TENANT_ID }}" \
+            -var "client_id=${{ secrets.ARM_CLIENT_ID }}" \
+            -var "client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var "admin_username=${{ secrets.AZURE_ADMIN_USERNAME }}" \
+            -var "admin_password=${{ secrets.AZURE_ADMIN_PASSWORD }}" \
+            packer/windows11.pkr.hcl
