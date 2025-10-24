@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - shellpacker
+      - shellpacker  # Make sure this matches the branch name
 
 jobs:
   packer:
@@ -17,13 +17,14 @@ jobs:
       - name: Install Packer
         run: |
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository \
-          "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get update && sudo apt-get install -y packer
 
-      - name: Build Windows 11 Image
+      - name: Packer Init
+        run: packer init packer/windows11.pkr.hcl
+
+      - name: Packer Validate
         run: |
-          packer init packer/windows11.pkr.hcl
           packer validate \
             -var "subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
             -var "tenant_id=${{ secrets.ARM_TENANT_ID }}" \
@@ -32,6 +33,9 @@ jobs:
             -var "admin_username=${{ secrets.AZURE_ADMIN_USERNAME }}" \
             -var "admin_password=${{ secrets.AZURE_ADMIN_PASSWORD }}" \
             packer/windows11.pkr.hcl
+
+      - name: Packer Build
+        run: |
           packer build \
             -var "subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
             -var "tenant_id=${{ secrets.ARM_TENANT_ID }}" \
