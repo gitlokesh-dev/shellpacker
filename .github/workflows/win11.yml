@@ -1,1 +1,37 @@
+name: Build Windows 11 Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository \
+          "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+
+      - name: Packer Init
+        run: packer init packer/windows11.pkr.hcl
+
+      - name: Validate Template
+        run: packer validate -var "resource_group_name=rg-packer" packer/windows11.pkr.hcl
+
+      - name: Build Image
+        run: packer build -var "resource_group_name=rg-packer" packer/windows11.pkr.hcl
 
