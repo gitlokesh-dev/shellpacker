@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - shellpacker  # Make sure this matches the branch name
+      - main  # Make sure this matches the branch name
 
 jobs:
   packer:
