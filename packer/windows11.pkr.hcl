@@ -30,7 +30,7 @@ source "azure-arm" "win11" {
   subnet_name                         = var.subnet_name
   private_virtual_network_with_public_ip = false
 
-  # Source: Windows 11 Pro 22H2
+  # Source: Windows 11 professional 22H2
   image_publisher = "MicrosoftWindowsDesktop"
   image_offer     = "windows11"
   image_sku       = "win11-22h2-pro"
